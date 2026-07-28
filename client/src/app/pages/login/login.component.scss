@@ -1,0 +1,29 @@
+.login-page {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: linear-gradient(135deg, #eef2ff, #f8fafc);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 380px;
+}
+
+.subtitle {
+  margin-top: 0;
+  color: var(--p-text-muted-color);
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  label {
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+}

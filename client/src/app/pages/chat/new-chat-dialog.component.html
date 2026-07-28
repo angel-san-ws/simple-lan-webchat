@@ -1,0 +1,50 @@
+<p-dialog
+  header="Start a new chat"
+  [modal]="true"
+  [(visible)]="visible"
+  [style]="{ width: '420px' }"
+  (onHide)="onHide()"
+>
+  <div class="dialog-body">
+    <label>Select who to chat with</label>
+    <p-listbox
+      [options]="chatState.otherOnlineUsers()"
+      optionLabel="name"
+      optionValue="id"
+      [multiple]="true"
+      [checkbox]="true"
+      [filter]="true"
+      filterPlaceHolder="Search people..."
+      [ngModel]="selectedUserIds()"
+      (ngModelChange)="selectedUserIds.set($event)"
+      [style]="{ width: '100%' }"
+      [listStyle]="{ 'max-height': '260px' }"
+      emptyMessage="No one else is online right now"
+    />
+
+    @if (selectedUserIds().length > 1) {
+      <label for="groupName">Group name (optional)</label>
+      <input
+        id="groupName"
+        type="text"
+        pInputText
+        [ngModel]="groupName()"
+        (ngModelChange)="groupName.set($event)"
+        placeholder="e.g. Project Team"
+        maxlength="60"
+        fluid
+      />
+    }
+  </div>
+
+  <ng-template #footer>
+    <p-button label="Cancel" severity="secondary" [text]="true" (onClick)="visible.set(false)" />
+    <p-button
+      label="Start chat"
+      icon="pi pi-send"
+      [disabled]="selectedUserIds().length === 0"
+      [loading]="creating()"
+      (onClick)="start()"
+    />
+  </ng-template>
+</p-dialog>

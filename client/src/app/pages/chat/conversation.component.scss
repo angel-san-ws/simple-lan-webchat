@@ -1,0 +1,161 @@
+.conversation {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.conversation-header {
+  display: flex;
+  flex-direction: column;
+  padding: 0.85rem 1.25rem;
+  border-bottom: 1px solid var(--p-content-border-color);
+
+  .title {
+    font-weight: 700;
+  }
+
+  .subtitle {
+    font-size: 0.8rem;
+    color: var(--p-text-muted-color);
+  }
+}
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.empty-conversation {
+  margin: auto;
+  color: var(--p-text-muted-color);
+}
+
+.message-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  max-width: 70%;
+
+  &.own {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+
+    .bubble {
+      background: var(--p-primary-color);
+      color: var(--p-primary-contrast-color);
+    }
+
+    .time {
+      color: var(--p-primary-contrast-color);
+      opacity: 0.75;
+    }
+  }
+
+  .message-actions {
+    display: flex;
+    gap: 0.15rem;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+
+  &:hover .message-actions {
+    opacity: 1;
+  }
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--p-text-muted-color);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--p-content-hover-background);
+    color: var(--p-text-color);
+  }
+}
+
+.bubble {
+  background: var(--p-content-hover-background);
+  border-radius: 14px;
+  padding: 0.5rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+
+  .sender-name {
+    font-size: 0.75rem;
+    font-weight: 700;
+    opacity: 0.8;
+  }
+
+  .text {
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .time {
+    font-size: 0.7rem;
+    color: var(--p-text-muted-color);
+    align-self: flex-end;
+  }
+
+  .edited-tag {
+    margin-left: 0.25rem;
+    font-style: italic;
+  }
+
+  .deleted-text {
+    font-style: italic;
+    opacity: 0.7;
+  }
+
+  .edit-box {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    min-width: 200px;
+
+    textarea {
+      resize: none;
+      max-height: 140px;
+    }
+
+    .edit-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.4rem;
+    }
+  }
+}
+
+.typing-indicator {
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--p-text-muted-color);
+}
+
+.composer {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.6rem;
+  padding: 0.75rem 1.25rem;
+  border-top: 1px solid var(--p-content-border-color);
+
+  textarea {
+    flex: 1;
+    resize: none;
+    max-height: 140px;
+  }
+}

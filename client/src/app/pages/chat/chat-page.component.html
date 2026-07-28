@@ -1,0 +1,81 @@
+<div class="chat-shell">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <p-avatar
+        [label]="initialsFor(chatState.currentUser()?.name)"
+        [style]="{ background: chatState.currentUser()?.color, color: '#fff' }"
+        shape="circle"
+      />
+      <span class="user-name">{{ chatState.currentUser()?.name }}</span>
+      <p-button
+        icon="pi pi-plus"
+        [rounded]="true"
+        [text]="true"
+        pTooltip="Start a new chat"
+        tooltipPosition="left"
+        (onClick)="openNewChat()"
+      />
+    </div>
+
+    <div class="online-strip">
+      <span class="section-label">Online &middot; {{ chatState.otherOnlineUsers().length }}</span>
+      <div class="online-avatars">
+        @for (u of chatState.otherOnlineUsers(); track u.id) {
+          <button
+            class="online-avatar-btn"
+            pTooltip="{{ u.name }}"
+            tooltipPosition="bottom"
+            (click)="startDirectChat(u.id)"
+          >
+            <p-avatar [label]="initialsFor(u.name)" [style]="{ background: u.color, color: '#fff' }" shape="circle" />
+          </button>
+        }
+        @if (chatState.otherOnlineUsers().length === 0) {
+          <span class="empty-hint">No one else is online right now</span>
+        }
+      </div>
+    </div>
+
+    <p-divider />
+
+    <div class="session-list">
+      <span class="section-label">Chats</span>
+      @for (session of chatState.sortedSessions(); track session.id) {
+        <button
+          class="session-item"
+          [class.active]="session.id === chatState.activeSessionId()"
+          (click)="chatState.selectSession(session.id)"
+        >
+          <p-avatar
+            [label]="initialsFor(chatState.sessionDisplayName(session))"
+            shape="circle"
+            styleClass="session-avatar"
+          />
+          <span class="session-info">
+            <span class="session-name">{{ chatState.sessionDisplayName(session) }}</span>
+            <span class="session-preview">{{ lastMessagePreview(session) }}</span>
+          </span>
+          @if (unreadFor(session.id) > 0) {
+            <p-badge [value]="unreadFor(session.id).toString()" severity="danger" />
+          }
+        </button>
+      }
+      @if (chatState.sessions().length === 0) {
+        <p class="empty-hint">Start a chat with someone online</p>
+      }
+    </div>
+  </aside>
+
+  <main class="conversation-pane">
+    @if (chatState.activeSession(); as session) {
+      <app-conversation [session]="session" />
+    } @else {
+      <div class="empty-state">
+        <i class="pi pi-comments"></i>
+        <p>Select a chat, or start a new one</p>
+      </div>
+    }
+  </main>
+</div>
+
+<app-new-chat-dialog [(visible)]="newChatVisible" />

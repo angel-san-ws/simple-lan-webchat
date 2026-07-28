@@ -1,0 +1,35 @@
+<div class="login-page">
+  <p-card class="login-card" header="LAN WebChat">
+    <p class="subtitle">Chat with anyone on your local network. No account needed.</p>
+
+    <form (ngSubmit)="submit()">
+      <label for="name">Display name</label>
+      <input
+        id="name"
+        type="text"
+        pInputText
+        [ngModel]="name()"
+        (ngModelChange)="name.set($event)"
+        name="name"
+        placeholder="e.g. Alex"
+        maxlength="40"
+        autocomplete="off"
+        [disabled]="submitting()"
+        fluid
+      />
+
+      @if (error()) {
+        <p-message severity="error" [text]="error()!" />
+      }
+
+      <p-button
+        type="submit"
+        label="Join chat"
+        icon="pi pi-arrow-right"
+        iconPos="right"
+        [loading]="submitting()"
+        fluid
+      />
+    </form>
+  </p-card>
+</div>

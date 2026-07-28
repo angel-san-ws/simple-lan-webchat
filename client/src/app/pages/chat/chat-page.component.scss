@@ -1,0 +1,138 @@
+.chat-shell {
+  display: flex;
+  height: 100%;
+}
+
+.sidebar {
+  width: 300px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--p-content-border-color);
+  background: var(--p-content-background);
+  overflow: hidden;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--p-content-border-color);
+
+  .user-name {
+    font-weight: 600;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.section-label {
+  display: block;
+  padding: 0.75rem 1rem 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--p-text-muted-color);
+}
+
+.online-strip {
+  .online-avatars {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0 1rem 0.5rem;
+  }
+}
+
+.online-avatar-btn {
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: transform 0.1s ease;
+
+  &:hover {
+    transform: scale(1.08);
+  }
+}
+
+.empty-hint {
+  padding: 0 1rem;
+  font-size: 0.85rem;
+  color: var(--p-text-muted-color);
+}
+
+.session-list {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 0.5rem;
+}
+
+.session-item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
+  padding: 0.6rem 1rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+
+  &:hover {
+    background: var(--p-content-hover-background);
+  }
+
+  &.active {
+    background: var(--p-highlight-background);
+  }
+}
+
+.session-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex: 1;
+
+  .session-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .session-preview {
+    font-size: 0.8rem;
+    color: var(--p-text-muted-color);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.conversation-pane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--p-text-muted-color);
+
+  i {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+  }
+}

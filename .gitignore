@@ -1,0 +1,25 @@
+# Node
+node_modules/
+npm-debug.log
+
+# Build output
+dist/
+
+# Angular
+.angular/cache
+
+# IDEs and editors
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/mcp.json
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Claude local settings
+.claude/settings.local.json

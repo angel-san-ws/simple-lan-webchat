@@ -1,0 +1,108 @@
+<div class="conversation">
+  <header class="conversation-header">
+    <span class="title">{{ chatState.sessionDisplayName(session()) }}</span>
+    <span class="subtitle">{{ participantSubtitle() }}</span>
+  </header>
+
+  <div class="messages">
+    @if (session().messages.length === 0) {
+      <div class="empty-conversation">
+        <p>No messages yet. Say hello!</p>
+      </div>
+    }
+
+    @for (message of session().messages; track message.id) {
+      <div class="message-row" [class.own]="isOwn(message)">
+        @if (!isOwn(message)) {
+          <p-avatar
+            [label]="initials(message.from.name)"
+            [style]="{ background: message.from.color, color: '#fff' }"
+            shape="circle"
+          />
+        }
+        <div class="bubble" [class.deleted]="message.deletedAt">
+          @if (!isOwn(message) && isGroup()) {
+            <span class="sender-name">{{ message.from.name }}</span>
+          }
+
+          @if (message.deletedAt) {
+            <p class="text deleted-text"><i class="pi pi-ban"></i> This message was deleted</p>
+          } @else if (editingMessageId() === message.id) {
+            <div class="edit-box">
+              <textarea
+                pTextarea
+                rows="1"
+                [autoResize]="true"
+                [ngModel]="editText()"
+                (ngModelChange)="editText.set($event)"
+                (keydown)="onEditKeydown($event, message)"
+              ></textarea>
+              <div class="edit-actions">
+                <p-button label="Cancel" size="small" [text]="true" (onClick)="cancelEdit()" />
+                <p-button
+                  label="Save"
+                  size="small"
+                  [disabled]="!editText().trim()"
+                  (onClick)="saveEdit(message)"
+                />
+              </div>
+            </div>
+          } @else {
+            <p class="text">{{ message.text }}</p>
+          }
+
+          @if (!message.deletedAt) {
+            <span class="time">
+              {{ formatTime(message.timestamp) }}
+              @if (message.editedAt) {
+                <span class="edited-tag">(edited)</span>
+              }
+            </span>
+          }
+        </div>
+
+        @if (canModify(message) && editingMessageId() !== message.id) {
+          <div class="message-actions">
+            <button
+              type="button"
+              class="action-btn"
+              pTooltip="Edit"
+              tooltipPosition="top"
+              (click)="startEdit(message)"
+            >
+              <i class="pi pi-pencil"></i>
+            </button>
+            <button
+              type="button"
+              class="action-btn"
+              pTooltip="Delete"
+              tooltipPosition="top"
+              (click)="deleteMessage(message)"
+            >
+              <i class="pi pi-trash"></i>
+            </button>
+          </div>
+        }
+      </div>
+    }
+
+    @if (typingLabel(); as label) {
+      <div class="typing-indicator">{{ label }}</div>
+    }
+
+    <div #scrollAnchor></div>
+  </div>
+
+  <footer class="composer">
+    <textarea
+      pTextarea
+      rows="1"
+      [autoResize]="true"
+      placeholder="Type a message..."
+      [ngModel]="messageText()"
+      (ngModelChange)="onInputChange($event)"
+      (keydown)="onKeydown($event)"
+    ></textarea>
+    <p-button icon="pi pi-send" [rounded]="true" [disabled]="!messageText().trim()" (onClick)="send()" />
+  </footer>
+</div>
