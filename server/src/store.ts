@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import type { ChatMessage, ChatSession, PublicUser } from './types.js';
+import type { Attachment, ChatMessage, ChatSession, PublicUser } from './types.js';
 
 const AVATAR_COLORS = [
   '#f97316', '#ef4444', '#22c55e', '#3b82f6', '#a855f7',
@@ -136,7 +136,12 @@ export class ChatStore {
     return { session: this.toChatSession(record), created: true };
   }
 
-  addMessage(sessionId: string, fromUserId: string, text: string): ChatMessage | undefined {
+  addMessage(
+    sessionId: string,
+    fromUserId: string,
+    text: string,
+    attachment?: Attachment,
+  ): ChatMessage | undefined {
     const session = this.sessions.get(sessionId);
     const from = this.toPublicUser(fromUserId);
     if (!session || !from) return undefined;
@@ -147,6 +152,7 @@ export class ChatStore {
       from,
       text,
       timestamp: Date.now(),
+      ...(attachment ? { attachment } : {}),
     };
     session.messages.push(message);
     if (session.messages.length > MAX_MESSAGES_PER_SESSION) {

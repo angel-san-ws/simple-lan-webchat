@@ -121,6 +121,48 @@
     opacity: 0.7;
   }
 
+  .attachment-image-link {
+    display: block;
+  }
+
+  .attachment-image {
+    max-width: 240px;
+    max-height: 240px;
+    border-radius: 10px;
+    display: block;
+  }
+
+  .attachment-file {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.6rem;
+    border-radius: 10px;
+    background: var(--p-content-background);
+    color: inherit;
+    text-decoration: none;
+    min-width: 160px;
+
+    .attachment-info {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .attachment-name {
+      font-size: 0.85rem;
+      font-weight: 600;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .attachment-size {
+      font-size: 0.7rem;
+      opacity: 0.7;
+    }
+  }
+
   .edit-box {
     display: flex;
     flex-direction: column;
@@ -157,5 +199,13 @@
     flex: 1;
     resize: none;
     max-height: 140px;
+  }
+
+  .file-input {
+    display: none;
+  }
+
+  .uploading-indicator {
+    color: var(--p-text-muted-color);
   }
 }

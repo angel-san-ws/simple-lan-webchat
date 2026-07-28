@@ -29,7 +29,8 @@ export class ChatPageComponent {
     const last = session.messages.at(-1);
     if (!last) return 'No messages yet';
     const prefix = last.from.id === this.chatState.currentUser()?.id ? 'You: ' : '';
-    return `${prefix}${last.text}`;
+    const body = last.text || (last.attachment ? `📎 ${last.attachment.name}` : '');
+    return `${prefix}${body}`;
   }
 
   unreadFor(sessionId: string): number {

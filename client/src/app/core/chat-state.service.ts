@@ -1,6 +1,6 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { SocketService } from './socket.service';
-import { ChatMessage, ChatSession, PublicUser } from './models';
+import { Attachment, ChatMessage, ChatSession, PublicUser } from './models';
 import { generateId } from './utils';
 
 const CLIENT_ID_KEY = 'lan-webchat:client-id';
@@ -93,11 +93,28 @@ export class ChatStateService {
     return ack.session;
   }
 
-  sendMessage(text: string): void {
+  sendMessage(text: string, attachment?: Attachment): void {
     const sessionId = this.activeSessionId();
-    if (!sessionId || !text.trim()) return;
-    this.socket.sendMessage({ sessionId, text: text.trim() });
+    const trimmed = text.trim();
+    if (!sessionId || (!trimmed && !attachment)) return;
+    this.socket.sendMessage({ sessionId, text: trimmed, attachment });
     this.setTyping(false);
+  }
+
+  async uploadFile(file: File): Promise<{ ok: boolean; attachment?: Attachment; error?: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const res = await fetch('/api/upload', { method: 'POST', body: formData });
+      const body = await res.json();
+      if (!res.ok || !body.ok) {
+        return { ok: false, error: body.error ?? 'Upload failed.' };
+      }
+      return { ok: true, attachment: body.attachment };
+    } catch {
+      return { ok: false, error: 'Upload failed. Check your connection.' };
+    }
   }
 
   async editMessage(messageId: string, text: string): Promise<{ ok: boolean; error?: string }> {

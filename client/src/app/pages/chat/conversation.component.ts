@@ -10,6 +10,7 @@ import { ChatMessage, ChatSession } from '../../core/models';
 import { initialsOf } from '../../core/utils';
 
 const TYPING_STOP_DELAY_MS = 2000;
+const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
 
 @Component({
   selector: 'app-conversation',
@@ -25,8 +26,10 @@ export class ConversationComponent {
   readonly messageText = signal('');
   readonly editingMessageId = signal<string | null>(null);
   readonly editText = signal('');
+  readonly uploading = signal(false);
 
   @ViewChild('scrollAnchor') private scrollAnchor?: ElementRef<HTMLDivElement>;
+  @ViewChild('fileInput') private fileInput?: ElementRef<HTMLInputElement>;
 
   private typingTimeout?: ReturnType<typeof setTimeout>;
 
@@ -93,6 +96,54 @@ export class ConversationComponent {
     this.messageText.set('');
     if (this.typingTimeout) clearTimeout(this.typingTimeout);
     this.chatState.setTyping(false);
+  }
+
+  openFilePicker(): void {
+    this.fileInput?.nativeElement.click();
+  }
+
+  async onFileSelected(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file) return;
+
+    if (file.size > MAX_UPLOAD_BYTES) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'File too large',
+        detail: 'Files must be 25 MB or smaller.',
+      });
+      return;
+    }
+
+    this.uploading.set(true);
+    const result = await this.chatState.uploadFile(file);
+    this.uploading.set(false);
+
+    if (!result.ok || !result.attachment) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Upload failed',
+        detail: result.error ?? 'Could not upload file.',
+      });
+      return;
+    }
+
+    this.chatState.sendMessage(this.messageText(), result.attachment);
+    this.messageText.set('');
+    if (this.typingTimeout) clearTimeout(this.typingTimeout);
+    this.chatState.setTyping(false);
+  }
+
+  isImage(message: ChatMessage): boolean {
+    return !!message.attachment?.mimeType.startsWith('image/');
+  }
+
+  formatFileSize(bytes: number): string {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   }
 
   startEdit(message: ChatMessage): void {

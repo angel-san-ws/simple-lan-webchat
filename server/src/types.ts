@@ -5,6 +5,14 @@ export interface PublicUser {
   online: boolean;
 }
 
+export interface Attachment {
+  id: string;
+  name: string;
+  size: number;
+  mimeType: string;
+  url: string;
+}
+
 export interface ChatMessage {
   id: string;
   sessionId: string;
@@ -13,6 +21,7 @@ export interface ChatMessage {
   timestamp: number;
   editedAt?: number;
   deletedAt?: number;
+  attachment?: Attachment;
 }
 
 export interface ChatSession {
@@ -51,6 +60,7 @@ export interface CreateSessionAck {
 export interface SendMessagePayload {
   sessionId: string;
   text: string;
+  attachment?: Attachment;
 }
 
 export interface TypingPayload {

@@ -48,7 +48,25 @@
               </div>
             </div>
           } @else {
-            <p class="text">{{ message.text }}</p>
+            @if (message.attachment; as attachment) {
+              @if (isImage(message)) {
+                <a [href]="attachment.url" target="_blank" rel="noopener" class="attachment-image-link">
+                  <img [src]="attachment.url" [alt]="attachment.name" class="attachment-image" />
+                </a>
+              } @else {
+                <a [href]="attachment.url" target="_blank" rel="noopener" download class="attachment-file">
+                  <i class="pi pi-file"></i>
+                  <span class="attachment-info">
+                    <span class="attachment-name">{{ attachment.name }}</span>
+                    <span class="attachment-size">{{ formatFileSize(attachment.size) }}</span>
+                  </span>
+                  <i class="pi pi-download"></i>
+                </a>
+              }
+            }
+            @if (message.text) {
+              <p class="text">{{ message.text }}</p>
+            }
           }
 
           @if (!message.deletedAt) {
@@ -94,6 +112,21 @@
   </div>
 
   <footer class="composer">
+    <input
+      #fileInput
+      type="file"
+      class="file-input"
+      (change)="onFileSelected($event)"
+    />
+    <p-button
+      icon="pi pi-paperclip"
+      [text]="true"
+      [rounded]="true"
+      [disabled]="uploading()"
+      pTooltip="Attach a file"
+      tooltipPosition="top"
+      (onClick)="openFilePicker()"
+    />
     <textarea
       pTextarea
       rows="1"
@@ -103,6 +136,9 @@
       (ngModelChange)="onInputChange($event)"
       (keydown)="onKeydown($event)"
     ></textarea>
+    @if (uploading()) {
+      <i class="pi pi-spin pi-spinner uploading-indicator"></i>
+    }
     <p-button icon="pi pi-send" [rounded]="true" [disabled]="!messageText().trim()" (onClick)="send()" />
   </footer>
 </div>

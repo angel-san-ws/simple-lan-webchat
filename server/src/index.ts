@@ -1,11 +1,15 @@
+import { randomUUID } from 'node:crypto';
 import { createServer } from 'node:http';
+import { mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import express from 'express';
 import cors from 'cors';
+import multer from 'multer';
 import { Server } from 'socket.io';
 import { ChatStore } from './store.js';
 import type {
+  Attachment,
   CreateSessionAck,
   CreateSessionPayload,
   DeleteMessageAck,
@@ -21,11 +25,53 @@ import type {
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT) || 3000;
 const CLIENT_DIST = path.join(__dirname, '..', '..', 'client', 'dist', 'client', 'browser');
+const UPLOADS_DIR = path.join(__dirname, '..', 'uploads');
+const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
+
+mkdirSync(UPLOADS_DIR, { recursive: true });
 
 const app = express();
 app.use(cors());
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
 
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: (_req, _file, cb) => cb(null, UPLOADS_DIR),
+    filename: (_req, file, cb) => {
+      const ext = path.extname(file.originalname).slice(0, 20);
+      cb(null, `${randomUUID()}${ext}`);
+    },
+  }),
+  limits: { fileSize: MAX_UPLOAD_BYTES },
+});
+
+app.post('/api/upload', upload.single('file'), (req, res) => {
+  const file = req.file;
+  if (!file) {
+    res.status(400).json({ ok: false, error: 'No file uploaded.' });
+    return;
+  }
+  const attachment: Attachment = {
+    id: randomUUID(),
+    name: file.originalname,
+    size: file.size,
+    mimeType: file.mimetype,
+    url: `/uploads/${file.filename}`,
+  };
+  res.json({ ok: true, attachment });
+});
+
+app.use(
+  (err: unknown, _req: express.Request, res: express.Response, next: express.NextFunction) => {
+    if (err instanceof multer.MulterError) {
+      res.status(400).json({ ok: false, error: err.message });
+      return;
+    }
+    next(err);
+  },
+);
+
+app.use('/uploads', express.static(UPLOADS_DIR));
 app.use(express.static(CLIENT_DIST));
 app.get(/.*/, (_req, res, next) => {
   res.sendFile(path.join(CLIENT_DIST, 'index.html'), (err) => {
@@ -42,6 +88,27 @@ const store = new ChatStore();
 
 function isNonEmptyString(v: unknown): v is string {
   return typeof v === 'string' && v.trim().length > 0;
+}
+
+function sanitizeAttachment(a: unknown): Attachment | undefined {
+  const candidate = a as Partial<Attachment> | undefined;
+  if (
+    !candidate ||
+    !isNonEmptyString(candidate.name) ||
+    !isNonEmptyString(candidate.mimeType) ||
+    !isNonEmptyString(candidate.url) ||
+    typeof candidate.size !== 'number' ||
+    !candidate.url.startsWith('/uploads/')
+  ) {
+    return undefined;
+  }
+  return {
+    id: isNonEmptyString(candidate.id) ? candidate.id : randomUUID(),
+    name: candidate.name,
+    mimeType: candidate.mimeType,
+    url: candidate.url,
+    size: candidate.size,
+  };
 }
 
 io.on('connection', (socket) => {
@@ -105,11 +172,13 @@ io.on('connection', (socket) => {
     const userId = socket.data.userId as string | undefined;
     if (!userId) return;
     const sessionId = payload?.sessionId;
-    const text = payload?.text?.trim();
-    if (!isNonEmptyString(sessionId) || !isNonEmptyString(text) || text.length > 4000) return;
+    const text = payload?.text?.trim() ?? '';
+    const attachment = sanitizeAttachment(payload?.attachment);
+    if (!isNonEmptyString(sessionId) || text.length > 4000) return;
+    if (!text && !attachment) return;
     if (!store.isParticipant(sessionId, userId)) return;
 
-    const message = store.addMessage(sessionId, userId, text);
+    const message = store.addMessage(sessionId, userId, text, attachment);
     if (message) {
       io.to(sessionId).emit('session:message', message);
     }
