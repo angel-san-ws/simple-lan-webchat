@@ -30,6 +30,16 @@ const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
 
 mkdirSync(UPLOADS_DIR, { recursive: true });
 
+/** ASCII `filename` fallback plus RFC 5987 `filename*` so every browser keeps non-ASCII names intact. */
+function attachmentDisposition(name: string): string {
+  const fallback = name.replace(/[^\x20-\x7e]/g, '_').replace(/["\\]/g, '_');
+  const encoded = encodeURIComponent(name).replace(
+    /['()*]/g,
+    (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`,
+  );
+  return `attachment; filename="${fallback}"; filename*=UTF-8''${encoded}`;
+}
+
 const app = express();
 app.use(cors());
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
@@ -43,6 +53,8 @@ const upload = multer({
     },
   }),
   limits: { fileSize: MAX_UPLOAD_BYTES },
+  // Busboy defaults to latin1, which garbles non-ASCII filenames (e.g. "año.pdf").
+  defParamCharset: 'utf8',
 });
 
 app.post('/api/upload', upload.single('file'), (req, res) => {
@@ -71,6 +83,15 @@ app.use(
   },
 );
 
+// `?name=<original filename>` makes the browser save the file under its original name
+// instead of the generated UUID used on disk.
+app.use('/uploads', (req, res, next) => {
+  const name = req.query.name;
+  if (typeof name === 'string' && name.trim()) {
+    res.setHeader('Content-Disposition', attachmentDisposition(path.basename(name)));
+  }
+  next();
+});
 app.use('/uploads', express.static(UPLOADS_DIR));
 app.use(express.static(CLIENT_DIST));
 app.get(/.*/, (_req, res, next) => {

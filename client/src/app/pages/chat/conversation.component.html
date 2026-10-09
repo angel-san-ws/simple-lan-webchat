@@ -1,4 +1,17 @@
-<div class="conversation">
+<div
+  class="conversation"
+  (dragenter)="onDragEnter($event)"
+  (dragover)="onDragOver($event)"
+  (dragleave)="onDragLeave($event)"
+  (drop)="onDrop($event)"
+>
+  @if (dragActive()) {
+    <div class="drop-overlay">
+      <i class="pi pi-upload"></i>
+      <span>Drop files to send</span>
+    </div>
+  }
+
   <header class="conversation-header">
     <span class="title">{{ chatState.sessionDisplayName(session()) }}</span>
     <span class="subtitle">{{ participantSubtitle() }}</span>
@@ -53,8 +66,12 @@
                 <a [href]="attachment.url" target="_blank" rel="noopener" class="attachment-image-link">
                   <img [src]="attachment.url" [alt]="attachment.name" class="attachment-image" />
                 </a>
+                <a [href]="downloadUrl(attachment)" [attr.download]="attachment.name" class="attachment-image-download">
+                  <i class="pi pi-download"></i>
+                  <span class="attachment-name">{{ attachment.name }}</span>
+                </a>
               } @else {
-                <a [href]="attachment.url" target="_blank" rel="noopener" download class="attachment-file">
+                <a [href]="downloadUrl(attachment)" [attr.download]="attachment.name" class="attachment-file">
                   <i class="pi pi-file"></i>
                   <span class="attachment-info">
                     <span class="attachment-name">{{ attachment.name }}</span>
@@ -115,6 +132,7 @@
     <input
       #fileInput
       type="file"
+      multiple
       class="file-input"
       (change)="onFileSelected($event)"
     />
@@ -123,7 +141,7 @@
       [text]="true"
       [rounded]="true"
       [disabled]="uploading()"
-      pTooltip="Attach a file"
+      pTooltip="Attach files (or drag & drop / paste)"
       tooltipPosition="top"
       (onClick)="openFilePicker()"
     />
