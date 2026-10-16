@@ -6,10 +6,11 @@ import { InputText } from 'primeng/inputtext';
 import { Card } from 'primeng/card';
 import { Message } from 'primeng/message';
 import { ChatStateService } from '../../core/chat-state.service';
+import { ThemeToggleComponent } from '../../core/theme-toggle.component';
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule, Button, InputText, Card, Message],
+  imports: [FormsModule, Button, InputText, Card, Message, ThemeToggleComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })

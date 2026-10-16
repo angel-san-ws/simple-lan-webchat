@@ -9,6 +9,12 @@ body {
   height: 100%;
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background: var(--p-content-background);
+  color: var(--p-text-color);
+}
+
+html.app-dark {
+  color-scheme: dark;
 }
 
 app-root {

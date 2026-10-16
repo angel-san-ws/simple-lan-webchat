@@ -6,13 +6,14 @@ import { Divider } from 'primeng/divider';
 import { Tooltip } from 'primeng/tooltip';
 import { ChatStateService } from '../../core/chat-state.service';
 import { ChatSession } from '../../core/models';
+import { ThemeToggleComponent } from '../../core/theme-toggle.component';
 import { initialsOf } from '../../core/utils';
 import { ConversationComponent } from './conversation.component';
 import { NewChatDialogComponent } from './new-chat-dialog.component';
 
 @Component({
   selector: 'app-chat-page',
-  imports: [Avatar, Badge, Button, Divider, Tooltip, ConversationComponent, NewChatDialogComponent],
+  imports: [Avatar, Badge, Button, Divider, Tooltip, ThemeToggleComponent, ConversationComponent, NewChatDialogComponent],
   templateUrl: './chat-page.component.html',
   styleUrl: './chat-page.component.scss',
 })
