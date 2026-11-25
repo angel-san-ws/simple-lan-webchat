@@ -10,7 +10,7 @@ import { Attachment, ChatMessage, ChatSession } from '../../core/models';
 import { initialsOf } from '../../core/utils';
 
 const TYPING_STOP_DELAY_MS = 2000;
-const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
+const MAX_UPLOAD_BYTES = 100 * 1024 * 1024;
 
 @Component({
   selector: 'app-conversation',
@@ -169,7 +169,7 @@ export class ConversationComponent {
         this.messageService.add({
           severity: 'error',
           summary: 'File too large',
-          detail: `${file.name} is larger than 25 MB.`,
+          detail: `${file.name} is larger than ${MAX_UPLOAD_BYTES / (1024 * 1024)} MB.`,
         });
         continue;
       }
